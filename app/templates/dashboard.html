@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IDS Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f8f9fa; }
+        h1 { color: #333; }
+        nav button { margin-right: 10px; padding: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #eee; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .filters { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Intrusion Detection System Dashboard</h1>
+
+    <nav>
+        <button onclick="showTab('history')">Alert History</button>
+        <button onclick="showTab('logs')">Log Viewer</button>
+    </nav>
+
+    <!-- Filters -->
+    <div class="filters">
+        <label>Protocol: <input type="text" id="protocol"></label>
+        <label>Start Date: <input type="date" id="start_date"></label>
+        <label>End Date: <input type="date" id="end_date"></label>
+        <button onclick="loadHistory()">Filter</button>
+        <button onclick="exportCSV()">Export CSV</button>
+    </div>
+
+    <!-- Alert History Tab -->
+    <div id="history" class="tab-content active">
+        <h2>Alert History</h2>
+        <table id="history-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Source IP</th>
+                    <th>Destination IP</th>
+                    <th>Protocol</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Logs Tab -->
+    <div id="logs" class="tab-content">
+        <h2>Log Viewer</h2>
+        <select id="log-select" onchange="viewLog()"></select>
+        <pre id="log-content" style="background:#eee; padding:10px; height:300px; overflow:auto;"></pre>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function loadHistory() {
+            const protocol = document.getElementById("protocol").value;
+            const start_date = document.getElementById("start_date").value;
+            const end_date = document.getElementById("end_date").value;
+
+            axios.get("/history", { params: { protocol, start_date, end_date } })
+                .then(response => {
+                    const tbody = document.querySelector("#history-table tbody");
+                    tbody.innerHTML = "";
+                    response.data.alerts.forEach(alert => {
+                        const row = `<tr>
+                            <td>${alert.timestamp}</td>
+                            <td>${alert.source_ip}</td>
+                            <td>${alert.destination_ip}</td>
+                            <td>${alert.protocol}</td>
+                            <td>${alert.alert_message}</td>
+                        </tr>`;
+                        tbody.innerHTML += row;
+                    });
+                });
+        }
+
+        function loadLogs() {
+            axios.get("/log_files").then(response => {
+                const select = document.getElementById("log-select");
+                select.innerHTML = "";
+                response.data.files.forEach(file => {
+                    const option = document.createElement("option");
+                    option.value = file;
+                    option.textContent = file;
+                    select.appendChild(option);
+                });
+                viewLog();
+            });
+        }
+
+        function viewLog() {
+            const file = document.getElementById("log-select").value;
+            axios.get("/view_log", { params: { log: file } }).then(response => {
+                document.getElementById("log-content").textContent = response.data.content.join("");
+            });
+        }
+
+        function exportCSV() {
+            const protocol = document.getElementById("protocol").value;
+            const start_date = document.getElementById("start_date").value;
+            const end_date = document.getElementById("end_date").value;
+
+            const params = new URLSearchParams({ protocol, start_date, end_date });
+            window.location.href = `/export_csv?${params.toString()}`;
+        }
+
+        // Initialize on page load
+        loadHistory();
+        loadLogs();
+    </script>
+</body>
+</html>

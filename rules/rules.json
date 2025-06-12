@@ -1,0 +1,44 @@
+[
+    {
+        "signature_id": "1001",
+        "protocol": 6,
+        "port": 80,
+        "payload_pattern": "GET /.* HTTP/1.[0-1]",
+        "severity": "Medium",
+        "description": "Suspicious HTTP GET request",
+        "intrusion_type": "Recon",
+        "message": "HTTP GET detected",
+        "category": "Web"
+    },
+    {
+        "signature_id": "1002",
+        "protocol": 17,
+        "port": 53,
+        "severity": "Low",
+        "description": "DNS query detected",
+        "intrusion_type": "Normal",
+        "message": "DNS query",
+        "category": "DNS"
+    },
+    {
+        "signature_id": "1003",
+        "protocol": 6,
+        "port": 445,
+        "severity": "High",
+        "description": "Potential SMB exploit attempt",
+        "intrusion_type": "Exploit",
+        "message": "SMB connection detected",
+        "category": "Network"
+    },
+    {
+        "signature_id": "1004",
+        "protocol": 6,
+        "port": 22,
+        "payload_pattern": "SSH.*Failed password",
+        "severity": "High",
+        "description": "SSH brute force attempt",
+        "intrusion_type": "BruteForce",
+        "message": "SSH brute force detected",
+        "category": "Authentication"
+    }
+]

@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from datetime import datetime, timezone
 class Alert(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     identifier = db.Column(db.String(36), unique=True)
@@ -8,7 +8,7 @@ class Alert(db.Model):
     source_port = db.Column(db.Integer)
     destination_port = db.Column(db.Integer)
     protocol = db.Column(db.String(10))
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     alert_type = db.Column(db.String(50))
     event_id = db.Column(db.String(36))
     payload = db.Column(db.Text)

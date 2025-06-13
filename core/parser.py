@@ -46,7 +46,7 @@ def parse_packet(packet):
         "hostname_source": resolve_hostname(ip_layer.src),
         "hostname_destination": resolve_hostname(ip_layer.dst)
     }
-    logging.debug(f"Initial alert created: {alert[identifier]}")
+    logging.debug(f"Initial alert created: {alert['identifier']}")
     if packet.haslayer(Ether):
         ether_layer = packet[Ether]
         alert["source_mac"] = ether_layer.src

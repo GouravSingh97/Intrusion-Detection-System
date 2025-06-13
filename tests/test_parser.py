@@ -14,4 +14,4 @@ class TestParser(unittest.TestCase):
         self.assertEqual(result["source_ip"], "192.168.1.1")
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main().
